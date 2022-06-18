@@ -8,7 +8,11 @@ import unittest
 
 class Node:
     def __init__(self, directed=True, ordered=True, _len=(1, 1)):
-        self.adj = ([], [])
+        if directed:
+            self.adj = ([], [])
+        else :
+            self.adj = [] #TODO: the undirected case has not yet been implemented
+
         self.directed = directed 
         self.ordered = ordered
         self.len = _len
@@ -16,7 +20,7 @@ class Node:
     def set_id(self, id):
         self.id = id 
 
-    def add_edge(self, id1, id2):
+    def add_edge(self, id1, id2, order=None):
         direction = 1 if id1 == self.id else 0
         to_id = id2 if id1 == self.id else id1
 
@@ -25,9 +29,11 @@ class Node:
         else: 
             adj = self.adj[direction]
 
-        if (self.directed) or (to_id not in adj):
+        if (to_id not in adj):
             if self.ordered:
-                to_id = (to_id, len(self.adj[direction]))
+                if order == None:
+                    order = len(self.adj[direction])
+                to_id = (to_id, order)
             self.adj[direction].append(to_id)
 
     def replace_edge(self, map_id, direction='bi'): #id1 -> id2
@@ -100,4 +106,3 @@ class Graph:
     def remove_edge(self, id1, id2, direction='bi'):
         self.nodes[id1].remove_edge(id2, direction=direction)
         self.nodes[id2].remove_edge(id1, direction=direction)
-

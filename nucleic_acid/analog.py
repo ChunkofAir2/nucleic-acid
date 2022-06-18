@@ -17,6 +17,3 @@ class NetList(SubGraph):
 
     def __str__(self): #encodes the netlist
         pass
-
-class Function(CircuitElement):
-    pass

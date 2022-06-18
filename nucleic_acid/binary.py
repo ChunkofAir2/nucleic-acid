@@ -11,6 +11,9 @@ import multiprocessing
 from .graph import Node, Graph
 from .parser import SubGraph
 
+def eval_boolean(graph):
+    pass
+
 class Boolean(Node):
     def __init__(self, _len): #len: (in_len, out_len)
         super().__init__(directed=True, ordered=True, len=_len)
@@ -33,8 +36,6 @@ class Boolean(Node):
         if other != None:
             self.g.add_edge(other.id, id)
         return id
-
-    #not very useful, TODO: delete
 
     def __call__(self):
         self.eval()
@@ -62,6 +63,12 @@ class Boolean(Node):
     def __invert__(self):
         self.add_gate(NOT)
 
+
+class Clock(Boolean):
+    def __init__(self):
+        super().__init__((0, 1))
+        pass
+
 class Bits(Boolean):
     def __init__(self, _len=1):
         super().__init__((_len, _len))
@@ -82,21 +89,27 @@ class Bits(Boolean):
             return self.bits
 
 class LogicList(SubGraph, Boolean):
-    def __init__(self, gate, mult=2):
+    def __init__(self, gate, method='dictated', mult=2):
         super().__init__()
         super(Boolean, self).__init__(_len = (i * mult for i in gate.length))
 
         self.mult = mult
         self.gate = gate
-        self.add_io()
+        self.add_io_by_method(method=method)
 
     def build(self):
-        dictation = {type(self.gate): (0, 1)}
         for i in range(self.mult):
             id = self.add_node(self.gate())
             self.add_edge('in', id)
             self.add_edge(id, 'out')
-        
+    
+    def add_io_by_method(self, method):
+        if method == 'dictated':
+            # add them according to the order they were added 
+            self.add_io({type(self.gate): (*range(self.gate.len[0]), )}, method=method)
+        elif method == 'aligned':
+            #simply use aligned, does not require extra variables
+            self.add_io(method=method)
 
 class OR(Boolean):
     length = (2, 1)
@@ -122,4 +135,3 @@ class NOT(Boolean):
 
     def eval(self):
         self.get_adj(direction = 'in')
-

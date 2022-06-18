@@ -6,10 +6,12 @@ import unittest
 @parse
 class BooleanAdder(): # generates a graph with a, b, c as inputs, outputing sum and carry
     def __init__(self):
-        self.input = var.bits(3).type(var.boolean)
+        self.inputs = (*var.bits(3).type(var.boolean))
+        self.outputs = (*var.bits(2).type(var.boolean))
 
     def build(self): # using logic gates and boolean logic
-        a, b, c = tuple(self.input.as_list())
+        a, b, c = self.input
+        sum, carry = self.output
 
         xor_ab, carry = None
 
@@ -17,7 +19,6 @@ class BooleanAdder(): # generates a graph with a, b, c as inputs, outputing sum 
         xor_ab ** c >> sum
         xor_ab * c + a * b >> carry
         
-        return (sum, carry)
     
     def __call__(self, bin_input):
         bin_input >> self.input
